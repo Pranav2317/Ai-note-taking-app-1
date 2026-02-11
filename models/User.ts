@@ -74,8 +74,6 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Create index on email for faster lookups
-UserSchema.index({ email: 1 });
 
 // Global mongoose cache to avoid model recompilation in development
 const global = globalThis as unknown as {

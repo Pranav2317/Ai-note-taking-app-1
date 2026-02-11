@@ -23,10 +23,10 @@ const RegisterPage: React.FC = () => {
   const router = useRouter();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: 'Demo User',
+    email: 'demo@prepstart.com',
+    password: '123456',
+    confirmPassword: '123456',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});

@@ -9,8 +9,8 @@ const LoginPage: React.FC = () => {
   const router = useRouter();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: 'demo@prepstart.com',
+    password: '123456',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -264,7 +264,7 @@ const LoginPage: React.FC = () => {
               </button>
 
               <p className="text-center text-sm text-slate-600 dark:text-slate-400">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/register" className="text-slate-800 dark:text-slate-200 font-medium">Register</Link>
               </p>
             </form>
