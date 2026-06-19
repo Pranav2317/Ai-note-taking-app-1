@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import NoteCard from '../components/NoteCard';
 import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../lib/auth-context';
@@ -32,7 +33,8 @@ interface Note {
  * Usage: Accessible at the root route "/"
  */
 const HomePage: React.FC = () => {
-  const { user, logout, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+  const { user, token, logout, isLoading: authLoading, isAuthenticated } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,16 +60,19 @@ const HomePage: React.FC = () => {
       if (query) setIsSearching(true);
       setError(null);
       
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
+      const authToken = token || localStorage.getItem('token');
+      if (!authToken) {
+        setNotes([]);
+        setFilteredNotes([]);
+        setIsLoading(false);
+        return;
       }
       
       // Build URL with search query if provided
       const url = query ? `/api/notes?q=${encodeURIComponent(query)}` : '/api/notes';
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${authToken}`,
         },
       });
       const data = await response.json();
@@ -242,13 +247,21 @@ const HomePage: React.FC = () => {
 
   // Fetch notes on component mount
   useEffect(() => {
-    if (!authLoading) {
-      fetchNotes();
+    if (authLoading) {
+      return;
     }
-  }, [authLoading]);
+
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      router.replace('/login');
+      return;
+    }
+
+    fetchNotes();
+  }, [authLoading, isAuthenticated, router]);
 
   // Show loading state while authentication is being verified
-  if (authLoading) {
+  if (authLoading || (!isAuthenticated && isLoading)) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
